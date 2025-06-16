@@ -29,7 +29,6 @@ const App = () => {
 
     fetchTasks();
 
-    // Real-time subscription using Supabase Realtime v2
     const realtimeChannel = supabase
       .channel('realtime-tasks')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, () => {
@@ -56,7 +55,7 @@ const App = () => {
   };
 
   const generateMessage = (task) => {
-    return `*Task Alert* 🔔\nTask: *${task.title}*\nAssigned to: ${task.assignedto}\nDeadline: ${task.duedate}\nStatus: ${task.status}\nKindly ensure timely completion.`;
+    return `*Task Alert* 🔔\nTask: *${task.title}*\nAssigned to: ${task.assignedto}\nDeadline: ${task.duedate}\nStatus: ${task.status}\nDetails: ${task.description || 'N/A'}\nKindly ensure timely completion.`;
   };
 
   return (
@@ -79,7 +78,14 @@ const App = () => {
           placeholder="Task Title"
           value={newTask.title}
           onChange={handleChange}
-          style={{ padding: "8px", marginRight: "8px", width: "30%" }}
+          style={{ padding: "8px", marginRight: "8px", width: "25%" }}
+        />
+        <input
+          name="description"
+          placeholder="Description"
+          value={newTask.description}
+          onChange={handleChange}
+          style={{ padding: "8px", marginRight: "8px", width: "25%" }}
         />
         <input
           name="duedate"
@@ -122,7 +128,7 @@ const App = () => {
           <div
             key={task.id}
             style={{
-              border: "1px solid #ccc",
+              border: "1px solid #ccc",     
               padding: "1rem",
               marginBottom: "1rem",
               borderRadius: "8px",
@@ -132,8 +138,7 @@ const App = () => {
             <h2>{task.title}</h2>
             <p><strong>Description:</strong> {task.description || "N/A"}</p>
             <p>
-              <strong>Due:</strong> {task.duedate} (
-              {formatDistanceToNow(new Date(task.duedate))} remaining)
+              <strong>Due:</strong> {task.duedate} ({formatDistanceToNow(new Date(task.duedate))} remaining)
             </p>
             <p><strong>Assigned To:</strong> {task.assignedto}</p>
             <p><strong>Priority:</strong> {task.priority}</p>
@@ -142,7 +147,7 @@ const App = () => {
               readOnly
               style={{ width: "100%", padding: "8px", marginTop: "1rem", fontFamily: "monospace" }}
               value={generateMessage(task)}
-              rows={4}
+              rows={5}
             />
           </div>
         ))
